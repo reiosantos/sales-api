@@ -1,0 +1,35 @@
+version: "3.1"
+
+services:
+  sales-api:
+    build: .
+    image: sales-api
+    container_name: sales-api
+    ports:
+      - 8001:8000
+    volumes:
+      - ./:/usr/src/app/
+    environment:
+      - ENV=local
+      - DJANGO_SETTINGS_MODULE=api.settings.docker
+      - DATABASE_URL=postgres://root:root@sales-db:5432/sales-api
+      - BASE_URL=http://sales-api:8000/
+    links:
+      - sales-db
+    depends_on:
+      - sales-db
+    command: bash -c "pip install -r requirements.txt && bash ./docker/run.sh"
+
+  sales-db:
+    image: postgres:12
+    container_name: sales-db
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: sales-api
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - 5433:5432
+    restart: always
+    volumes:
+      - ./datadir:/var/lib/postgresql/data
