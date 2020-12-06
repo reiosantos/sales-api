@@ -14,6 +14,8 @@ services:
       - DJANGO_SETTINGS_MODULE=api.settings.docker
       - DATABASE_URL=postgres://root:root@sales-db:5432/sales-api
       - BASE_URL=http://sales-api:8000/
+      - EMAIL_HOST_USER=ronireiosantos@gmail.com
+      - EMAIL_HOST_PASSWORD=kiyvuylobsrbyknp
     links:
       - sales-db
     depends_on:

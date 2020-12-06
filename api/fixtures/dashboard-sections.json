@@ -1,0 +1,106 @@
+[
+	{
+		"fields": {
+			"var_define": "dateFormat.shortTime",
+			"label": "Time format (e.g. HH:mm)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 1
+	},
+	{
+		"fields": {
+			"var_define": "dateFormat.mediumDate",
+			"label": "Date format (e.g. dd-MMM-yyy)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 2
+	},
+	{
+		"fields": {
+			"var_define": "dateFormat.medium",
+			"label": "Date format with time (e.g. dd-MMM-yyyy HH:mm)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 3
+	},
+	{
+		"fields": {
+			"var_define": "dateFormat.full",
+			"label": "Date format with day-of-week and time (e.g. EEE d MMM HH:mm)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 4
+	},
+	{
+		"fields": {
+			"var_define": "TERMS_URL",
+			"label": "T&C link"
+		},
+		"model": "venue.venuesetting",
+		"pk": 5
+	},
+	{
+		"fields": {
+			"var_define": "PRIVACY_POLICY_URL",
+			"label": "Privacy Policy link"
+		},
+		"model": "venue.venuesetting",
+		"pk": 6
+	},
+	{
+		"fields": {
+			"var_define": "DEFAULT_LANGUAGE_CODE",
+			"label": "Default language (example: en-us)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 7
+	},
+	{
+		"fields": {
+			"var_define": "ENABLE_DEPOSIT",
+			"label": "Enable usage of the Deposit system for payments"
+		},
+		"model": "venue.venuesetting",
+		"pk": 8
+	},
+	{
+		"fields": {
+			"var_define": "DEFAULT_CURRENCY",
+			"label": "Default currency for the Deposit system (example: usd, ush,...)"
+		},
+		"model": "venue.venuesetting",
+		"pk": 9
+	},
+	{
+		"fields": {
+			"var_define": "MANDATORY_CREDIT_CARD",
+			"label": "User must enter their credit card info before accessing other resources"
+		},
+		"model": "venue.venuesetting",
+		"pk": 10
+	},
+	{
+		"fields": {
+			"var_define": "STARTING_DAY_IN_WEEK",
+			"label": "Starting day in week for calendar, format: 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday"
+		},
+		"model": "venue.venuesetting",
+		"pk": 11
+	},
+	{
+		"fields": {
+			"var_define": "VENUE_ADMIN_EMAIL",
+			"label": "Venue Admin email"
+		},
+		"model": "venue.venuesetting",
+		"pk": 12
+	},
+	{
+		"fields": {
+			"var_define": "DEFAULT_SUPPORT_EMAIL",
+			"label": "Venue Support Email"
+		},
+		"model": "venue.venuesetting",
+		"pk": 13
+	}
+]

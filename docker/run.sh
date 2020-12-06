@@ -2,6 +2,7 @@
 
 if [[ $ENV == 'local' ]]; then
 	echo "ENV LOCAL -------------------"
+	python manage.py makemigrations
 	python manage.py migrate --noinput
 	python manage.py loaddata api/fixtures/*.json
 	python manage.py collectstatic --noinput

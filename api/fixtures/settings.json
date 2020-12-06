@@ -1,0 +1,29 @@
+[
+	{
+        "fields": {
+            "route_name" : "home",
+            "name" : "Home",
+            "is_visible_to_all" : 1
+        },
+        "model": "user.DashboardSection",
+        "pk" : 1
+    },
+	{
+        "fields": {
+            "route_name" : "stock",
+            "name" : "Stock",
+            "is_visible_to_all" : 0
+        },
+        "model": "user.DashboardSection",
+        "pk" : 2
+    },
+	{
+        "fields": {
+            "route_name" : "sales",
+            "name" : "Sales",
+            "is_visible_to_all" : 0
+        },
+        "model": "user.DashboardSection",
+        "pk" : 3
+    }
+]

@@ -1,1 +1,37 @@
-{}
+[
+	{
+		"fields": {
+			"name": "SuperAdmin"
+		},
+		"model": "venue.role",
+		"pk": 1
+	},
+	{
+		"fields": {
+			"name": "Admin"
+		},
+		"model": "venue.role",
+		"pk": 2
+	},
+	{
+		"fields": {
+			"name": "Venue Manager"
+		},
+		"model": "venue.role",
+		"pk": 3
+	},
+	{
+		"fields": {
+			"name": "Venue Staff"
+		},
+		"model": "venue.role",
+		"pk": 4
+	},
+	{
+		"fields": {
+			"name": "Default"
+		},
+		"model": "venue.role",
+		"pk": 5
+	}
+]

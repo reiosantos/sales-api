@@ -1,0 +1,65 @@
+[
+	{
+		"fields": {
+			"permission_name": "read"
+		},
+		"model": "permission.permission",
+		"pk": 1
+	},
+	{
+		"fields": {
+			"permission_name": "report"
+		},
+		"model": "permission.permission",
+		"pk": 2
+	},
+	{
+		"fields": {
+			"permission_name": "delete"
+		},
+		"model": "permission.permission",
+		"pk": 3
+	},
+	{
+		"fields": {
+			"permission_name": "edit"
+		},
+		"model": "permission.permission",
+		"pk": 4
+	},
+	{
+		"fields": {
+			"permission_name": "sms"
+		},
+		"model": "permission.permission",
+		"pk": 5
+	},
+	{
+		"fields": {
+			"permission_name": "payment"
+		},
+		"model": "permission.permission",
+		"pk": 6
+	},
+	{
+		"fields": {
+			"permission_name": "deposit"
+		},
+		"model": "permission.permission",
+		"pk": 7
+	},
+	{
+		"fields": {
+			"permission_name": "refund"
+		},
+		"model": "permission.permission",
+		"pk": 8
+	},
+	{
+		"fields": {
+			"permission_name": "management"
+		},
+		"model": "permission.permission",
+		"pk": 9
+	}
+]

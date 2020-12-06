@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -32,17 +33,27 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
 	'django.apps',
+	'django.contrib.contenttypes',
 	'django.contrib.admin',
 	'django.contrib.auth',
-	'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
-	'rest_framework',
 
-	'import_export',
+	'api.apps.venue',
+	'api.apps.user',
+	'api.apps.common',
+	'api.apps.email',
+	'api.apps.company',
+	'api.apps.permission',
+	'api.apps.terminology',
+
+	'rest_framework',
+	'django_filters',
+	'django_countries',
 	'corsheaders',
-	'rest_framework_swagger',
+	'drf_yasg',
+	'import_export',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +66,7 @@ MIDDLEWARE = [
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'api.apps.venue.middleware.VenueMiddleware'
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -155,6 +167,8 @@ LANGUAGES = [
 	('fr', 'French')
 ]
 
+AUTH_USER_MODEL = "venue.User"
+
 AUTHENTICATION_BACKENDS = [
 	'django.contrib.auth.backends.ModelBackend',
 ]
@@ -195,15 +209,31 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = 587
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'ronireiosantos@gmail.com'
 
-SWAGGER_SETTINGS = {
-	'api_version': '1.0',
-	'info': {
-		'description': 'The Official API documentation for the Sales management software',
-		'title': 'Sales Management API'
-	},
-	'api_path': '/api/',
-	'base_path': 'local.sms.com/api/docs'
+REST_FRAMEWORK = {
+	'DEFAULT_PAGINATION_CLASS': None,
+	'DEFAULT_RENDERER_CLASSES': [
+		'api.apps.common.camel_case.render.CamelCaseJSONRenderer',
+	],
+	'DEFAULT_FILTER_BACKENDS': [
+		'django_filters.rest_framework.DjangoFilterBackend',
+		'api.apps.common.filter_backends.VenueFilterBackend'
+	],
+	'DEFAULT_PARSER_CLASSES': [
+		'api.apps.common.camel_case.parser.CamelCaseJSONParser',
+		'rest_framework.parsers.MultiPartParser',
+		'rest_framework.parsers.FormParser',
+	],
+	'DEFAULT_PERMISSION_CLASSES': [
+		'rest_framework.permissions.IsAuthenticated',
+	],
+	'DEFAULT_AUTHENTICATION_CLASSES': [
+		'api.apps.user.authentication.JSONWebTokenAuthenticationPost',
+	],
+	'EXCEPTION_HANDLER': 'api.apps.common.exception_handler',
+	'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 LOGGING = {
@@ -251,7 +281,7 @@ LOGGING = {
 		},
 	},
 	'loggers': {
-		'sales-api': {
+		'api': {
 			'handlers': ['console', 'file'],
 			'level': 'DEBUG',
 			'propagate': True,
@@ -268,3 +298,32 @@ LOGGING = {
 		}
 	}
 }
+
+JWT_AUTH = {
+	'JWT_DECODE_HANDLER': 'api.apps.user.custom_jwt_decode_handler',
+	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1800),  # 30 minutes
+}
+
+SWAGGER_SETTINGS = {
+	'SECURITY_DEFINITIONS': {
+		'Bearer': {
+			'type': 'apiKey',
+			'name': 'Authorization',
+			'in': 'header'
+		}
+	}
+}
+
+LOGIN_URL = '/auth/login'
+
+LOGOUT_URL = '/auth/logout'
+
+APP_NAME = 'Sales Control'
+
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24  # 24 hours
+
+DEFAULT_SUPPORT_EMAIL = 'ronireiosantos@gmail.com'
+
+DASHBOARD_URL = "/dashboard"
+
+BASE_URL = os.getenv('BASE_URL', '')
