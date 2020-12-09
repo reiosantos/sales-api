@@ -5,9 +5,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 
 from api.apps.permission.models import Permission
-from api.apps.user.models import User, DashboardSection, VenueViewerType
+from api.apps.user.models import DashboardSection, VenueViewerType
 from api.apps.user.utils import ensure_user_associated_with_venue
-from api.apps.venue.models import Role, UserData
+from api.apps.venue.models import Role, UserData, User
 from api.apps.venue.serializers import VenueSerializer
 
 log = logging.getLogger('api')

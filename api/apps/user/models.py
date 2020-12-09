@@ -1,10 +1,7 @@
 from django.db import models
-from django.db.models import Q
 
 from api.apps.common.model_mixins import BaseModelMixin
-from api.apps.permission.models import Permission
 from api.apps.user.constants import VIEWER_TYPE_DEFAULT
-from api.apps.venue.models import Venue, User, Role
 
 
 class DashboardSectionManager(models.Manager):
@@ -17,7 +14,7 @@ class DashboardSectionManager(models.Manager):
 		if not viewer_type_ids:
 			viewer_type_ids = VenueViewerType.objects.filter(
 				venue=venue,
-				name=VIEWER_TYPE_DEFAULT
+				role__name=VIEWER_TYPE_DEFAULT
 			).values_list('pk')
 
 		# If there are viewer-type IDs, return the relevant dashboard sections
@@ -50,18 +47,18 @@ class VenueViewerType(BaseModelMixin):
 	able to see all tabs in the dashboard.
 	"""
 
-	name = models.ForeignKey(Role, on_delete=models.CASCADE)
-	venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-	sections = models.ManyToManyField(DashboardSection, related_name='viewer_types')
+	role = models.ForeignKey('venue.Role', on_delete=models.CASCADE)
+	venue = models.ForeignKey('venue.Venue', on_delete=models.CASCADE, related_name='viewer_types')
+	sections = models.ManyToManyField('DashboardSection', related_name='viewer_types')
 
 	# The users that have this viewer-type
-	users = models.ManyToManyField(User, related_name='viewer_types')
+	users = models.ManyToManyField('venue.User', related_name='viewer_types')
 
 	# The permissions this viewer-type grants at its venue
-	permissions = models.ManyToManyField(Permission)
+	permissions = models.ManyToManyField('permission.Permission')
 
 	class Meta:
-		unique_together = (('venue', 'name',),)
+		unique_together = (('venue', 'role',),)
 
 	def __str__(self):
-		return '%s at %s' % (self.name, self.venue,)
+		return '%s at %s' % (self.role.name, self.venue,)

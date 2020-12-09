@@ -30,7 +30,7 @@ class Venue(BaseModelMixin):
 	language_code = models.CharField(max_length=7, choices=LANGUAGES, default='en-gb')
 	company = models.ForeignKey(
 		'company.Company', on_delete=models.CASCADE, null=False, blank=False, related_name='venues')
-	logo = models.ImageField(default=None, blank=True, null=True, upload_to='venues')
+	logo_url = models.CharField(max_length=200, blank=True, null=True, default='images/logo.png')
 
 	def __str__(self):
 		return self.name
@@ -101,16 +101,6 @@ class Venue(BaseModelMixin):
 		timezone = pytz.timezone(str(self.local_timezone))
 		return timezone.localize(time_to_convert)
 
-	@property
-	def logo_url(self):
-		"""
-		URL of venue logo.
-		"""
-		if self.logo:
-			return self.logo.url
-		else:
-			return 'images/logo.png'
-
 
 class Role(BaseModelMixin):
 	name = models.CharField(max_length=50)
@@ -168,7 +158,7 @@ class User(BaseModelMixin, AbstractBaseUser, PermissionsMixin):
 	email = models.EmailField(max_length=100, blank=True, null=True, unique=True, db_index=True)
 	is_active = models.BooleanField(db_column='active', default=False)
 	date_joined = models.DateTimeField(db_column='dt', blank=True, null=True, default=datetime.now)
-	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='users')
 	is_admin = models.BooleanField(default=False, null=True)
 	user_type = models.ForeignKey(UserType, blank=True, null=True, on_delete=models.SET_NULL)
 	venues = models.ManyToManyField(Venue, through='UsersVenues')
@@ -270,6 +260,7 @@ class VenueSetting(BaseModelMixin):
 		 ' 4=Thursday, 5=Friday, 6=Saturday'),
 		('VENUE_ADMIN_EMAIL', 'Venue Admin email'),
 		('DEFAULT_SUPPORT_EMAIL', 'Venue Support Email'),
+		('SELLING_PRICE_BELOW_BUYING_PRICE', 'Allow selling price to be less that buying price'),
 	)
 
 	DICT_OF_CHOICES = {key: value for (key, value) in CHOICES_KEY}

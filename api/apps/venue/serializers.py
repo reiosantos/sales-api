@@ -26,7 +26,10 @@ class VenueSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Venue
-		fields = ('id', 'url_component', 'name', 'active', 'timezone', 'offset', 'settings', 'url')
+		fields = (
+			'id', 'url_component', 'name', 'active', 'timezone', 'offset', 'settings', 'url',
+			'logo_url'
+		)
 
 	def get_timezone(self, obj):
 		return obj.local_timezone.zone

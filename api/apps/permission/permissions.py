@@ -1,8 +1,8 @@
 from rest_framework import permissions
 from rest_framework.exceptions import ValidationError, NotAuthenticated
 
-from api.apps.user.models import User
 from api.apps.user.utils import user_has_venue_permission
+from api.apps.venue.models import User
 
 
 def validate_perm(request):
