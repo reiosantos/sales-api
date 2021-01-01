@@ -2,6 +2,7 @@ import logging
 import sys
 import traceback
 
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.exceptions import NotAuthenticated, PermissionDenied, ValidationError
 from rest_framework.response import Response
@@ -29,6 +30,13 @@ def exception_handler(exc, context):
 		logger.error(error_msg)
 	else:
 		logger.info(error_msg)
+
+	if exc_type == IntegrityError:
+		try:
+			exc = str(exc).split('DETAIL:', 1)[1].strip()
+			exc = f"Duplicate: {exc}"
+		except (IndexError, AttributeError):
+			pass
 
 	original_response = default_exception_handler(exc, context)
 

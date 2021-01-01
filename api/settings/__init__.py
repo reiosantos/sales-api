@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 	'api.apps.permission',
 	'api.apps.terminology',
 	'api.apps.auditlogs',
+	'api.apps.inventory',
 
 	'rest_framework',
 	'django_filters',
@@ -305,7 +306,7 @@ LOGGING = {
 
 JWT_AUTH = {
 	'JWT_DECODE_HANDLER': 'api.apps.user.custom_jwt_decode_handler',
-	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=(60 * 60)),  # 60 minutes
+	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=(60 * 60 * 24)),  # 24 hours
 }
 
 SWAGGER_SETTINGS = {
