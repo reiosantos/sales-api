@@ -32,7 +32,7 @@ class IsVenueManagerOrReadOnly(IsVenueManager):
 		user = validate_perm(request)
 		if request.method == 'GET':
 			return True
-		elif request.method in ['POST', 'PUT', 'DELETE'] and user.is_venue_manager(request.venue):
+		elif request.method in ['POST', 'PUT', 'DELETE', 'PATCH'] and user.is_venue_manager(request.venue):
 			return True
 
 		return None

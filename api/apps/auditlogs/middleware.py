@@ -12,6 +12,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 from api.apps.auditlogs.models import AuditLog
 from api.apps.common.cc_json_encoder import CCJSONEncoder
+from api.apps.user import custom_jwt_decode_handler
 
 thread_local = threading.local()
 log = logging.getLogger('api')
@@ -22,6 +23,18 @@ class AuditlogMiddleware(MiddlewareMixin):
 	Middleware to couple the request's user to log items. This is accomplished by currying the signal
 	receiver with the user from the request (or None if the user is not authenticated).
 	"""
+
+	def get_user(self, request):
+		header_token = request.META.get('HTTP_AUTHORIZATION', None)
+		if header_token is not None:
+			try:
+				token = header_token.split(' ')[1]
+				user = custom_jwt_decode_handler(token)
+				return user['user_id']
+			except Exception as e:
+				log.error(e)
+				pass
+		return None
 
 	def process_request(self, request):
 		"""
@@ -43,7 +56,7 @@ class AuditlogMiddleware(MiddlewareMixin):
 		set_save_actor = partial(
 			self.set_pre_actor,
 			action='save',
-			user=getattr(request, 'user', None),
+			user=self.get_user(request),
 			venue=getattr(request, 'venue', None),
 			signal_uid=thread_local.auditlog['signal_uid']
 		)
@@ -104,17 +117,23 @@ class AuditlogMiddleware(MiddlewareMixin):
 		info['table_name'] = instance._meta.db_table
 		info['table_pk'] = instance.pk
 		info['action'] = kwargs.get('action')
-		info['prev_entity'] = json.dumps(obj, cls=CCJSONEncoder)
-		info['user'] = kwargs.get('user')
+		info['prev_entity'] = json.loads(json.dumps(obj, cls=CCJSONEncoder))
+		info['user_id'] = kwargs.get('user')
 		info['venue'] = kwargs.get('venue')
 
 		query_kwargs = dict()
 		query_kwargs[instance._meta.pk.name] = info['table_pk']
 		try:
 			prev_instance = sender.objects.get(**query_kwargs)
-			info['prev_entity'] = json.dumps(model_to_dict(prev_instance), cls=CCJSONEncoder)
+			info['prev_entity'] = json.loads(
+				json.dumps(model_to_dict(prev_instance), cls=CCJSONEncoder))
 		except ObjectDoesNotExist as e:
 			log.info("Signals: creating new instance of " + str(sender))
 
-		audit = AuditLog.objects.create(**info)
-		audit.save()
+		try:
+			audit = AuditLog.objects.create(**info)
+			audit.save()
+		except ValueError as e:
+			# SimpleLazyObject: <django.contrib.auth.models.AnonymousUser>
+			# Cannot be assigned to User instance
+			log.error(e)

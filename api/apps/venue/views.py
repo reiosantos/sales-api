@@ -17,6 +17,11 @@ log = logging.getLogger(__name__)
 class VenueSettingsView(UpdateAPIView, ListCreateAPIView):
 	serializer_class = VenueSettingValueSerializer
 
+	def get_serializer(self, *args, **kwargs):
+		if getattr(self, "swagger_fake_view", False):
+			return None
+		return super(VenueSettingsView, self).get_serializer(*args, **kwargs)
+
 	def get_queryset(self):
 		venue = self.request.venue
 		if not venue:
@@ -52,7 +57,7 @@ class VenueSettingsView(UpdateAPIView, ListCreateAPIView):
 		return Response(data)
 
 
-# @with_default_permission_classes()
+@with_default_permission_classes()
 class VenuesListView(ListAPIView):
 	"""
 	List all venues.
@@ -83,3 +88,8 @@ class VenueSettingsUpdateView(RetrieveUpdateAPIView):
 		if not venue:
 			raise ValidationError({'error': 'Invalid venue'})
 		return venue.setting_values.exclude(setting__var_define__isnull=True)
+
+	def get_serializer(self, *args, **kwargs):
+		if getattr(self, "swagger_fake_view", False):
+			return None
+		return super(VenueSettingsUpdateView, self).get_serializer(*args, **kwargs)

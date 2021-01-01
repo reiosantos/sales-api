@@ -186,7 +186,7 @@ class User(BaseModelMixin, AbstractBaseUser, PermissionsMixin):
 		return self._manager_viewer_types().filter(venue=venue).exists()
 
 	def _manager_viewer_types(self):
-		return self.viewer_types.filter(name=VIEWER_TYPE_MANAGER)
+		return self.viewer_types.filter(role__name=VIEWER_TYPE_MANAGER)
 
 	def get_short_name(self):
 		return self.email
