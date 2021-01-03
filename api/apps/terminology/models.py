@@ -86,10 +86,12 @@ class TranslationManager(models.Manager):
 
 
 class Translation(BaseModelMixin):
-	term = models.ForeignKey(Term, on_delete=models.CASCADE)
-	language = models.ForeignKey(Language, on_delete=models.CASCADE)
+	term = models.ForeignKey(Term, on_delete=models.CASCADE, related_name='translations')
+	language = models.ForeignKey(Language, on_delete=models.CASCADE, related_name='translations')
 	value = models.TextField()
-	venue = models.ForeignKey('venue.Venue', blank=True, null=True, on_delete=models.SET_NULL)
+	venue = models.ForeignKey(
+		'venue.Venue', blank=True, null=True, on_delete=models.SET_NULL,
+		related_name='translations')
 
 	objects = TranslationManager()
 

@@ -54,6 +54,7 @@ urlpatterns = [
 	path('permissions/', include('api.apps.permission.urls', namespace='permissions')),
 	path('users/', include('api.apps.user.urls', namespace='users')),
 	path('venues/', include('api.apps.venue.urls', namespace='venues')),
+	path('inventory/', include('api.apps.inventory.urls', namespace='inventory')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

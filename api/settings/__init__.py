@@ -47,6 +47,8 @@ INSTALLED_APPS = [
 	'api.apps.company',
 	'api.apps.permission',
 	'api.apps.terminology',
+	'api.apps.auditlogs',
+	'api.apps.inventory',
 
 	'rest_framework',
 	'django_filters',
@@ -66,7 +68,8 @@ MIDDLEWARE = [
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'api.apps.venue.middleware.VenueMiddleware'
+	'api.apps.venue.middleware.VenueMiddleware',
+	'api.apps.auditlogs.middleware.AuditlogMiddleware',
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -213,7 +216,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 DEFAULT_FROM_EMAIL = 'ronireiosantos@gmail.com'
 
 REST_FRAMEWORK = {
-	'DEFAULT_PAGINATION_CLASS': None,
+	'DEFAULT_PAGINATION_CLASS': 'api.apps.common.pagination.Pagination',
 	'DEFAULT_RENDERER_CLASSES': [
 		'api.apps.common.camel_case.render.CamelCaseJSONRenderer',
 	],
@@ -301,7 +304,7 @@ LOGGING = {
 
 JWT_AUTH = {
 	'JWT_DECODE_HANDLER': 'api.apps.user.custom_jwt_decode_handler',
-	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1800),  # 30 minutes
+	'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=(60 * 60 * 24)),  # 24 hours
 }
 
 SWAGGER_SETTINGS = {

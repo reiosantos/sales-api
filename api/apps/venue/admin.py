@@ -17,7 +17,7 @@ class UserTypeInline(admin.TabularInline):
 class VenueAdmin(ImportExportModelAdmin):
 	search_fields = ('name',)
 	list_display = ('name', 'url_component', 'address',)
-	inlines = (VenueSettingValueInline,)
+	inlines = [VenueSettingValueInline]
 
 
 class UserTypeAdmin(admin.ModelAdmin):
@@ -37,11 +37,8 @@ class UserAdmin(admin.ModelAdmin):
 	search_fields = ('email',)
 	list_display = ('email', 'role', 'user_type',)
 	fields = ('email', 'is_active', 'role', 'user_type', 'is_admin', 'date_joined', 'last_login',)
-	readonly_fields = ('date_joined', 'last_login', 'created_date', 'modified_date')
-	inlines = (
-		VenueViewerTypeInline,
-		UserVenueInline
-	)
+	readonly_fields = ('date_joined', 'last_login', 'created_at', 'modified_at')
+	inlines = [VenueViewerTypeInline, UserVenueInline]
 
 
 admin.site.register(Venue, VenueAdmin)

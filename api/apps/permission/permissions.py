@@ -1,8 +1,8 @@
 from rest_framework import permissions
 from rest_framework.exceptions import ValidationError, NotAuthenticated
 
-from api.apps.user.models import User
 from api.apps.user.utils import user_has_venue_permission
+from api.apps.venue.models import User
 
 
 def validate_perm(request):
@@ -32,7 +32,7 @@ class IsVenueManagerOrReadOnly(IsVenueManager):
 		user = validate_perm(request)
 		if request.method == 'GET':
 			return True
-		elif request.method in ['POST', 'PUT', 'DELETE'] and user.is_venue_manager(request.venue):
+		elif request.method in ['POST', 'PUT', 'DELETE', 'PATCH'] and user.is_venue_manager(request.venue):
 			return True
 
 		return None
