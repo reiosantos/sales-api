@@ -55,6 +55,8 @@ urlpatterns = [
 	path('users/', include('api.apps.user.urls', namespace='users')),
 	path('venues/', include('api.apps.venue.urls', namespace='venues')),
 	path('inventory/', include('api.apps.inventory.urls', namespace='inventory')),
+	path('customers/', include('api.apps.customers.urls', namespace='customers')),
+	path('sales/', include('api.apps.sales.urls', namespace='sales')),
 ]
 
 if 'silk' in settings.INSTALLED_APPS:
