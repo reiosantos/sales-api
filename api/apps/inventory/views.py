@@ -15,17 +15,23 @@ class ItemVendorViewSet(ModelViewSet):
 
 class ItemCategoryViewSet(ModelViewSet):
 	serializer_class = ItemCategorySerializer
-	queryset = ItemCategory.objects.all()
 	permission_classes = [IsAuthenticated, IsVenueManagerOrReadOnly]
+
+	def get_queryset(self):
+		return ItemCategory.objects.filter(venue=self.request.venue)
 
 
 class ItemSubCategoryViewSet(ModelViewSet):
 	serializer_class = ItemSubCategorySerializer
-	queryset = ItemSubCategory.objects.all()
 	permission_classes = [IsAuthenticated, IsVenueManagerOrReadOnly]
+
+	def get_queryset(self):
+		return ItemSubCategory.objects.filter(category__venue=self.request.venue)
 
 
 class ItemTypeViewSet(ModelViewSet):
 	serializer_class = ItemTypeSerializer
-	queryset = ItemType.objects.all()
 	permission_classes = [IsAuthenticated, IsVenueManagerOrReadOnly]
+
+	def get_queryset(self):
+		return ItemType.objects.filter(venue=self.request.venue)

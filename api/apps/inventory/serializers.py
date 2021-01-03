@@ -42,6 +42,7 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 	subcategory = serializers.PrimaryKeyRelatedField(
 		queryset=ItemSubCategory.objects.all(), required=True
 	)
+	venue = serializers.PrimaryKeyRelatedField(read_only=True)
 	name = serializers.CharField(required=True)
 	description = serializers.CharField(required=False)
 	unit_buying_price = serializers.DecimalField(required=True, decimal_places=3, max_digits=13)
@@ -55,6 +56,7 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 	def validate(self, attrs):
 		attrs = super(ItemTypeSerializer, self).validate(attrs)
 		venue: Venue = self.context['request'].venue
+		attrs['venue'] = venue
 
 		if venue and (attrs.get('unit_selling_price') or attrs.get('unit_buying_price')):
 			setting = venue.get_setting_value('SELLING_PRICE_BELOW_BUYING_PRICE')

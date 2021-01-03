@@ -34,7 +34,7 @@ def exception_handler(exc, context):
 	if exc_type == IntegrityError:
 		try:
 			exc = str(exc).split('DETAIL:', 1)[1].strip()
-			exc = f"Duplicate: {exc}"
+			exc = f"Integrity Check: {exc}"
 		except (IndexError, AttributeError):
 			pass
 

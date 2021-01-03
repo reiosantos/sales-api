@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 	'api.apps.terminology',
 	'api.apps.auditlogs',
 	'api.apps.inventory',
+	'api.apps.customers',
+	'api.apps.sales',
 
 	'rest_framework',
 	'django_filters',

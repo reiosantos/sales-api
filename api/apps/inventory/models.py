@@ -43,6 +43,9 @@ class ItemType(BaseModelMixin):
 	subcategory = models.ForeignKey(
 		ItemSubCategory, on_delete=models.CASCADE, related_name="items", null=False
 	)
+	venue = models.ForeignKey(
+		'venue.Venue', related_name='items', blank=False, null=False, on_delete=models.CASCADE
+	)
 	name = models.CharField(max_length=220, null=False, blank=False)
 	description = models.TextField(null=True, blank=True)
 	unit_buying_price = models.DecimalField(max_digits=13, blank=False, decimal_places=3, default=0)
@@ -59,4 +62,4 @@ class ItemType(BaseModelMixin):
 		return '%s - %s' % (self.subcategory, self.name)
 
 	class Meta:
-		unique_together = (('name', 'subcategory', 'vendor'),)
+		unique_together = (('name', 'subcategory', 'vendor', 'venue'),)
