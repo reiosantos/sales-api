@@ -52,6 +52,7 @@ urlpatterns = [
 	path('health/', HealthCheckView.as_view({'get': 'get'}), name='health_check'),
 	path('admin/', admin.site.urls),
 	path('permissions/', include('api.apps.permission.urls', namespace='permissions')),
+	path('terminology/', include('api.apps.terminology.urls', namespace='terminology')),
 	path('users/', include('api.apps.user.urls', namespace='users')),
 	path('venues/', include('api.apps.venue.urls', namespace='venues')),
 	path('inventory/', include('api.apps.inventory.urls', namespace='inventory')),
