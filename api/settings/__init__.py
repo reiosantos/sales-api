@@ -71,6 +71,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'api.urls'
 
+URL_PREFIX = 'api/v1/'
+
 TEMPLATES = [
 	{
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',

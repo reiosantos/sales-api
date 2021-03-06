@@ -47,7 +47,7 @@ urlpatterns = [
 	path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 	path('auth/', include('rest_framework.urls', namespace='rest_framework')),
 	path('accounts/', include('django.contrib.auth.urls')),
-	path('jwt/login', ObtainJSONWebToken.as_view()),
+	path('jwt/login/', ObtainJSONWebToken.as_view()),
 	path('jwt/verify/', VerifyJSONWebToken.as_view(), name='verify'),
 	path('health/', HealthCheckView.as_view({'get': 'get'}), name='health_check'),
 	path('admin/', admin.site.urls),
@@ -56,13 +56,19 @@ urlpatterns = [
 	path('venues/', include('api.apps.venue.urls', namespace='venues')),
 ]
 
+if 'silk' in settings.INSTALLED_APPS:
+	urlpatterns += [
+		path('silk/', include('silk.urls', namespace='silk'))
+	]
+
+# Add 'prefix' to all urlpatterns (except static files)
+if settings.URL_PREFIX:
+	urlpatterns = [
+		path(settings.URL_PREFIX, include(urlpatterns))
+	]
+
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += [
 	path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT})
 ]
-
-if 'silk' in settings.INSTALLED_APPS:
-	urlpatterns += [
-		path('silk/', include('silk.urls', namespace='silk'))
-	]
