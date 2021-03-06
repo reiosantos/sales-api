@@ -1,5 +1,7 @@
 from api.settings import *
 
+ALLOWED_HOSTS = ['*']
+
 DEBUG = True
 
 SSL_ENABLED = False
