@@ -22,10 +22,20 @@ from django.urls import path, include, re_path
 from django.views.static import serve
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
 from rest_framework.permissions import AllowAny
 from rest_framework_jwt.views import VerifyJSONWebToken, ObtainJSONWebToken
 
 from api.apps.common.views import HealthCheckView
+
+
+class CustomOpenAPISchemaGenerator(OpenAPISchemaGenerator):
+	def get_schema(self, *args, **kwargs):
+		schema = super().get_schema(*args, **kwargs)
+		schema.basePath = f"/{getattr(settings, 'URL_PREFIX', '')}"  # API prefix
+		schema.schemes = ['http', 'https']
+		return schema
+
 
 schema_view = get_schema_view(
 	openapi.Info(
@@ -37,7 +47,8 @@ schema_view = get_schema_view(
 		license=openapi.License(name="BSD License"),
 	),
 	public=True,
-	permission_classes=(AllowAny,)
+	permission_classes=(AllowAny,),
+	generator_class=CustomOpenAPISchemaGenerator,
 )
 
 urlpatterns = [
