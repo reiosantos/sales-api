@@ -4,11 +4,8 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 
-from api.apps.permission.models import Permission
-from api.apps.user.models import DashboardSection, VenueViewerType
 from api.apps.user.utils import ensure_user_associated_with_venue
-from api.apps.venue.models import Role, UserData, User
-from api.apps.venue.serializers import VenueSerializer
+from api.apps.venue.models import UserData, User
 
 log = logging.getLogger('api')
 
@@ -47,12 +44,8 @@ class UserSerializer(serializers.ModelSerializer):
 	country = serializers.CharField(source='profile.country', allow_blank=True, required=False)
 	mobile_confirmed = serializers.BooleanField(
 		source='profile.mobile_confirmed', default=False, required=False)
-	venues = VenueSerializer(many=True, read_only=True)
-	user_type = serializers.StringRelatedField(source='user_type.name')
-	role = serializers.StringRelatedField(source='role.name')
 
-	sections = serializers.SerializerMethodField()
-	permissions = serializers.SerializerMethodField()
+	role = serializers.SerializerMethodField()
 
 	class Meta:
 		model = User
@@ -60,7 +53,6 @@ class UserSerializer(serializers.ModelSerializer):
 		fields = (
 			'email',
 			'mobile',
-			'user_type',
 			'role',
 			'first_name',
 			'last_name',
@@ -71,21 +63,15 @@ class UserSerializer(serializers.ModelSerializer):
 			'city',
 			'country',
 			'mobile_confirmed',
-			'sections',
-			'permissions',
-			'venues',
 			'is_active'
 		)
 
-	def get_sections(self, instance):
-		venue = self.context.get('request').venue
-		return DashboardSection.objects.visible_to(instance, venue).values_list(
-			'route_name', flat=True)
-
-	def get_permissions(self, instance):
-		venue = self.context.get('request').query_params.get('venue')
-		return instance.viewer_types.filter(venue__url_component=venue) \
-			.values_list('permissions__permission_name', flat=True)
+	def get_role(self, instance: User):
+		venue = self.context.get('request').get('venue')
+		try:
+			return instance.roles.filter(venue=venue).first().name
+		except AttributeError:
+			return None
 
 
 class ActivateUserSerializer(UserSerializer):
@@ -96,46 +82,6 @@ class ActivateUserSerializer(UserSerializer):
 		instance.is_active = True
 		instance.save()
 		return instance
-
-
-class DashboardSectionSerializer(serializers.ModelSerializer):
-	value = serializers.CharField(source='route_name')
-	display_name = serializers.CharField(source='name')
-
-	class Meta:
-		model = DashboardSection
-		fields = ('value', 'display_name')
-
-
-class VenueViewerTypeSerializer(serializers.ModelSerializer):
-	value = serializers.IntegerField(source='pk', read_only=True)
-	display_name = serializers.CharField(source='name')
-
-	sections = serializers.SlugRelatedField(
-		slug_field='route_name',
-		queryset=DashboardSection.objects.all(),
-		many=True,
-	)
-
-	permissions = serializers.SlugRelatedField(
-		slug_field='permission_name',
-		queryset=Permission.objects.all(),
-		many=True,
-		required=False
-	)
-
-	class Meta:
-		model = VenueViewerType
-		fields = (
-			'value',
-			'display_name',
-			'sections',
-			'permissions'
-		)
-
-	def create(self, validated_data):
-		validated_data['venue'] = self.context['request'].venue
-		return super(VenueViewerTypeSerializer, self).create(validated_data)
 
 
 class EditUserSerializer(UserSerializer):
@@ -171,7 +117,6 @@ class CreateUserSerializer(UserSerializer):
 
 			with transaction.atomic():
 				profile_data['user'] = User.objects.create_user(
-					role=Role.objects.get_or_create(name='Role')[0],
 					email=validated_data['email'],
 					password=validated_data['password'],
 					is_active=False
@@ -185,7 +130,7 @@ class CreateUserSerializer(UserSerializer):
 			return profile_data['user']
 		except KeyError as e:
 			log.error(e)
-			raise ParseError({'error': "Some data was missing"})
+			raise ParseError({'error': "Some data is missing"})
 
 	class Meta(UserSerializer.Meta):
 		fields = UserSerializer.Meta.fields + ('password',)

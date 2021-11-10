@@ -1,6 +1,5 @@
 from api.apps.common.camel_case.util import camel_to_underscore
 from api.apps.common.util import CustomTemplate
-from api.apps.user.models import VenueViewerType
 from api.apps.venue.models import UsersVenues, UserData, User
 
 
@@ -10,32 +9,6 @@ def ensure_user_associated_with_venue(user, venue):
 	associates the user with the venue.
 	"""
 	UsersVenues.objects.get_or_create(user=user, venue=venue)
-
-
-def user_has_venue_permission(venue, user, permission_name):
-	"""
-	Whether or not the user has the named permission at the venue in virtue of
-	having a VenueViewerType at that Venue.
-
-	This means the user has a global permission for all bookings at the venue.
-
-	Returns:
-		(bool)
-	"""
-	return VenueViewerType.objects.filter(
-		venue=venue, users=user, permissions__permission_name=permission_name).exists()
-
-
-def users_venue_permissions(venue, user):
-	"""
-	The names of any permissions the user has at a venue, in virtue of their
-	venue-viewer-type(s).  These are permissions the user will have for all
-	bookings at the venue.
-	Returns:
-		(ValuesListQuerySet)
-	"""
-	return VenueViewerType.objects.filter(venue=venue, users=user) \
-		.values_list('permissions__permission_name', flat=True).distinct()
 
 
 def user_exists_as_email(email):

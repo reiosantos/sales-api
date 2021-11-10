@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
@@ -23,6 +24,7 @@ class ItemSaleViewSet(ModelViewSet):
 			return queryset
 		return queryset.filter(~Q(deleted=True))
 
+	@transaction.atomic
 	def destroy(self, request, *args, **kwargs):
 		instance: ItemSale = self.get_object()
 

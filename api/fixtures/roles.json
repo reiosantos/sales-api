@@ -3,35 +3,35 @@
 		"fields": {
 			"name": "SuperAdmin"
 		},
-		"model": "venue.role",
+		"model": "permission.role",
 		"pk": 1
 	},
 	{
 		"fields": {
 			"name": "Admin"
 		},
-		"model": "venue.role",
+		"model": "permission.role",
 		"pk": 2
 	},
 	{
 		"fields": {
-			"name": "Venue Manager"
+			"name": "Manager"
 		},
-		"model": "venue.role",
+		"model": "permission.role",
 		"pk": 3
 	},
 	{
 		"fields": {
-			"name": "Venue Staff"
+			"name": "Staff"
 		},
-		"model": "venue.role",
+		"model": "permission.role",
 		"pk": 4
 	},
 	{
 		"fields": {
 			"name": "Default"
 		},
-		"model": "venue.role",
+		"model": "permission.role",
 		"pk": 5
 	}
 ]

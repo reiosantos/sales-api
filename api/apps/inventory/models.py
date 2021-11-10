@@ -13,7 +13,8 @@ class ItemVendor(BaseModelMixin):
 class ItemCategory(BaseModelMixin):
 	name = models.CharField(max_length=220, unique=True, null=False, blank=False)
 	venue = models.ForeignKey(
-		'venue.Venue', related_name='categories', blank=True, null=True, on_delete=models.SET_NULL
+		'venue.Venue', related_name='item_categories', blank=True, null=True,
+		on_delete=models.SET_NULL
 	)
 
 	def __str__(self):

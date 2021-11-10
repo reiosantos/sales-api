@@ -56,10 +56,10 @@ class EditItemSaleSerializer(ItemSaleSerializer):
 	def update(self, instance, validated_data):
 
 		item = validated_data.get('item', instance.item)
-		unit_price = validated_data.get('unit_price', instance.unit_price)
+		unit_price = validated_data.get('unit_price')
 		min_sell_price = item.unit_selling_price
 
-		if unit_price < min_sell_price:
+		if unit_price and unit_price < min_sell_price:
 			raise ValidationError({
 				"error": f"Selling price cannot be less than the minimum set price of {min_sell_price}"
 			})

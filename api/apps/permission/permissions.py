@@ -1,7 +1,6 @@
 from rest_framework import permissions
 from rest_framework.exceptions import ValidationError, NotAuthenticated
 
-from api.apps.user.utils import user_has_venue_permission
 from api.apps.venue.models import User
 
 
@@ -10,10 +9,16 @@ def validate_perm(request):
 		raise ValidationError({'error': 'Venue Not Found'})
 
 	user = request.user
-	if not isinstance(user, User):
+	if not isinstance(user, User) or not user.is_authenticated:
 		raise NotAuthenticated({'error': 'Authentication credentials were not provided.'})
 
 	return user
+
+
+class IsSuperAdmin(permissions.BasePermission):
+	def has_permission(self, request, view):
+		user = validate_perm(request)
+		return user.is_superuser
 
 
 class IsVenueManager(permissions.BasePermission):
@@ -30,12 +35,26 @@ class IsVenueManagerOrReadOnly(IsVenueManager):
 
 	def has_permission(self, request, view):
 		user = validate_perm(request)
+		restricted_methods = ['POST', 'PUT', 'DELETE', 'PATCH']
+
 		if request.method == 'GET':
 			return True
-		elif request.method in ['POST', 'PUT', 'DELETE', 'PATCH'] and user.is_venue_manager(request.venue):
+		elif request.method in restricted_methods and user.is_venue_manager(request.venue):
 			return True
 
 		return None
+
+
+class IsVenueAdmin(permissions.BasePermission):
+	def has_permission(self, request, view):
+		user = validate_perm(request)
+		return user.is_venue_admin(request.venue)
+
+
+class IsVenueStaff(permissions.BasePermission):
+	def has_permission(self, request, view):
+		user = validate_perm(request)
+		return user.is_staff(request.venue)
 
 
 class AllowGetOnly(permissions.BasePermission):
@@ -46,14 +65,3 @@ class AllowGetOnly(permissions.BasePermission):
 
 		# Otherwise, only allow authenticated requests
 		return request.user and request.user.is_authenticated
-
-
-class ManagementPermissions(permissions.BasePermission):
-	def has_permission(self, request, view):
-		user = validate_perm(request)
-		return user_has_venue_permission(request.venue, user, 'management')
-
-
-class IsSuperAdmin(permissions.BasePermission):
-	def has_permission(self, request, view):
-		return request.user and request.user.is_authenticated and request.user.is_superuser

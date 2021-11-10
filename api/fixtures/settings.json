@@ -105,7 +105,7 @@
 	},
 	{
 		"fields": {
-			"var_define": "SELLING_PRICE_BELOW_BUYING_PRICE",
+			"var_define": "ALLOW_SELLING_PRICE_BELOW_BUYING_PRICE",
 			"label": "Allow selling price to be less that buying price"
 		},
 		"model": "venue.venuesetting",

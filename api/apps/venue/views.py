@@ -7,7 +7,7 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView, RetrieveUpda
 from rest_framework.response import Response
 
 from api.apps.common.permission_utils import with_default_permission_classes
-from api.apps.permission.permissions import IsVenueManager, IsSuperAdmin
+from api.apps.permission.permissions import IsVenueManager, IsSuperAdmin, IsVenueAdmin
 from api.apps.venue.models import Venue, VenueSetting, VenueSettingValue
 from api.apps.venue.serializers import VenueSettingValueSerializer, VenueSerializer
 
@@ -69,8 +69,8 @@ class VenuesListView(ListAPIView):
 
 @with_default_permission_classes()
 class VenueSettingsUpdateView(RetrieveUpdateAPIView):
-	serializer_class = VenueSettingValueSerializer,
-	permission_classes = [IsVenueManager]
+	serializer_class = VenueSettingValueSerializer
+	permission_classes = [IsVenueManager, IsVenueAdmin, IsSuperAdmin]
 	lookup_field = 'path'
 
 	def get_object(self):

@@ -13,7 +13,7 @@ from timezone_field import TimeZoneField
 from api.apps.common.fields import LowerCaseCharField
 from api.apps.common.model_mixins import BaseModelMixin
 from api.apps.common.util import convert_to_python_date_string_format
-from api.apps.user.constants import VIEWER_TYPE_MANAGER
+from api.apps.permission.models import Role
 
 
 class Venue(BaseModelMixin):
@@ -24,7 +24,7 @@ class Venue(BaseModelMixin):
 	address = models.TextField(blank=True, null=True)
 	active = models.BooleanField(default=True, blank=False, null=False)
 	url_component = LowerCaseCharField(max_length=200, blank=False, null=False, unique=True)
-	users = models.ManyToManyField('User', through='UsersVenues')
+	users = models.ManyToManyField('User', through='UsersVenues', related_name="venues")
 	local_timezone = TimeZoneField(default='Africa/Kampala')
 	country = CountryField(default='UG')
 	language_code = models.CharField(max_length=7, choices=LANGUAGES, default='en-gb')
@@ -102,43 +102,21 @@ class Venue(BaseModelMixin):
 		return timezone.localize(time_to_convert)
 
 
-class Role(BaseModelMixin):
-	name = models.CharField(max_length=50)
-
-	def __str__(self):
-		return self.name
-
-
-class UserType(BaseModelMixin):
-	name = models.CharField(max_length=50)
-	venues = models.ManyToManyField(
-		Venue, related_name='user_types', db_constraint=False, blank=True)
-
-	def __str__(self):
-		return self.name
-
-
 class UserManager(BaseUserManager):
 	use_in_migrations = True
 
-	def _create_user(self, email, password, is_admin, is_active=True, role=None, **extra_fields):
+	def _create_user(self, email, password, is_admin, is_active=True, **extra_fields):
 		"""
 		Creates and saves a User with the given username, email and password.
 		"""
-
-		if not role:
-			if is_admin:
-				role = Role.objects.get_or_create(name='SuperAdmin')[0]
-			else:
-				raise ValueError('You must specify a Role')
 
 		if not email:
 			raise ValueError('The given username/email must be set')
 
 		email = self.normalize_email(email)
 		user = self.model(
-			email=email, role=role, is_active=is_active, is_admin=is_admin,
-			date_joined=datetime.now(), **extra_fields)
+			email=email, is_active=is_active, is_admin=is_admin, date_joined=datetime.now(),
+			**extra_fields)
 
 		user.set_password(password)
 		user.save()
@@ -157,36 +135,35 @@ class User(BaseModelMixin, AbstractBaseUser, PermissionsMixin):
 	"""
 	email = models.EmailField(max_length=100, blank=True, null=True, unique=True, db_index=True)
 	is_active = models.BooleanField(db_column='active', default=False)
-	date_joined = models.DateTimeField(db_column='dt', blank=True, null=True, default=datetime.now)
-	role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='users')
+	date_joined = models.DateTimeField(blank=True, null=True, default=datetime.now)
 	is_admin = models.BooleanField(default=False, null=True)
-	user_type = models.ForeignKey(UserType, blank=True, null=True, on_delete=models.SET_NULL)
-	venues = models.ManyToManyField(Venue, through='UsersVenues')
 
 	REQUIRED_FIELDS = []
 	USERNAME_FIELD = 'email'
 
 	objects = UserManager()
 
-	@property
-	def is_staff(self):
-		return self.is_admin
+	def is_venue_admin(self, venue: Venue):
+		return self.roles.filter(venue=venue, name=Role.ADMIN).exists()
+
+	def is_staff(self, venue: Venue):
+		return self.roles.filter(venue=venue, name=Role.STAFF).exists()
 
 	@property
 	def is_superuser(self):
-		# check if user has superadmin role assigned to him/her instead of admin
-		if self.role.name and self.role.name.lower() == 'superadmin':
-			return True
-		return False
+		return self.is_admin
 
 	def is_venue_manager(self, venue):
 		"""
 		Whether or not the user is a 'manager' / 'admin' at a given venue.
 		"""
-		return self._manager_viewer_types().filter(venue=venue).exists()
+		return self.roles.filter(venue=venue, name=Role.MANAGER).exists()
 
-	def _manager_viewer_types(self):
-		return self.viewer_types.filter(role__name=VIEWER_TYPE_MANAGER)
+	def is_venue_user(self, venue):
+		"""
+		Whether or not the user is a 'manager' / 'admin' at a given venue.
+		"""
+		return self.roles.filter(venue=venue, name=Role.DEFAULT).exists()
 
 	def get_short_name(self):
 		return self.email
@@ -215,9 +192,9 @@ class User(BaseModelMixin, AbstractBaseUser, PermissionsMixin):
 
 
 class UserData(BaseModelMixin):
+	user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 	first_name = models.CharField(max_length=100, blank=True, null=True)
 	last_name = models.CharField(max_length=100, blank=True, null=True)
-	user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
 	mobile = models.CharField(max_length=45, blank=True, null=True)
 	address1 = models.CharField(max_length=200, blank=True, null=True)
 	address2 = models.CharField(max_length=200, blank=True, null=True)
@@ -260,7 +237,7 @@ class VenueSetting(BaseModelMixin):
 		 ' 4=Thursday, 5=Friday, 6=Saturday'),
 		('VENUE_ADMIN_EMAIL', 'Venue Admin email'),
 		('DEFAULT_SUPPORT_EMAIL', 'Venue Support Email'),
-		('SELLING_PRICE_BELOW_BUYING_PRICE', 'Allow selling price to be less that buying price'),
+		('ALLOW_SELLING_PRICE_BELOW_BUYING_PRICE', 'Allow selling price to be less than buying price'),
 	)
 
 	DICT_OF_CHOICES = {key: value for (key, value) in CHOICES_KEY}
@@ -272,8 +249,8 @@ class VenueSetting(BaseModelMixin):
 
 
 class VenueSettingValue(BaseModelMixin):
-	setting = models.ForeignKey(VenueSetting, on_delete=models.CASCADE)
 	venue = models.ForeignKey(Venue, related_name='setting_values', on_delete=models.CASCADE)
+	setting = models.ForeignKey(VenueSetting, on_delete=models.CASCADE)
 	value = models.TextField(blank=True, null=True)
 
 	class Meta:

@@ -58,16 +58,16 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 		venue: Venue = self.context['request'].venue
 		attrs['venue'] = venue
 
-		if venue and (attrs.get('unit_selling_price') or attrs.get('unit_buying_price')):
-			setting = venue.get_setting_value('SELLING_PRICE_BELOW_BUYING_PRICE')
-			if not setting or not bool(int(setting)):
-				try:
+		try:
+			if venue and (attrs['unit_selling_price'] or attrs['unit_buying_price']):
+				setting = venue.get_setting_value('ALLOW_SELLING_PRICE_BELOW_BUYING_PRICE')
+				if not setting or not bool(int(setting)):
 					if attrs['unit_selling_price'] < attrs['unit_buying_price']:
 						raise ValidationError(
 							{"error": "Selling price cannot be less than Buying price"})
-				except KeyError:
-					raise ValidationError(
-							{"error": "Both Selling price and Buying price are required"})
+		except KeyError:
+			raise ValidationError(
+					{"error": "Both Selling price and Buying price are required"})
 
 		return attrs
 

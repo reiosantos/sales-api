@@ -6,22 +6,16 @@ from django.core.signing import TimestampSigner
 from django.db import transaction
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, CreateAPIView, ListAPIView, \
-	DestroyAPIView
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
-from api.apps.common.permission_utils import with_default_permission_classes
 from api.apps.email.utils import site_url, VerifyUserEmail
-from api.apps.permission.permissions import ManagementPermissions
-from api.apps.permission.serializers import PermissionSerializer
 from api.apps.user import serializers
-from api.apps.user.models import DashboardSection, VenueViewerType
-from api.apps.user.utils import (
-	users_venue_permissions, user_exists_as_email, user_exists_as_mobile)
+from api.apps.user.utils import user_exists_as_email, user_exists_as_mobile
 from api.apps.venue.models import User, Venue
 
 log = logging.getLogger('api')
@@ -49,9 +43,15 @@ class CurrentUserView(RetrieveAPIView, UpdateAPIView, DestroyAPIView):
 	def get_object(self):
 		return self.request.user
 
+	@transaction.atomic
+	def patch(self, request, *args, **kwargs):
+		return self.partial_update(request, *args, **kwargs)
+
+	@transaction.atomic
 	def put(self, request, *args, **kwargs):
 		return self.partial_update(request, *args, **kwargs)
 
+	@transaction.atomic
 	def delete(self, request, *args, **kwargs):
 		instance = self.get_object()
 		instance.is_active = False
@@ -122,38 +122,3 @@ class UserExistView(APIView):
 			return Response(user_exists_as_email(self.request.GET.get('email')))
 
 		return Response(False)
-
-
-class UserVenuePermissionsView(APIView):
-	"""
-	Get list of permissions for user and venue.
-	params:
-	- venue (from url parameter)
-	- user (from authentication header)
-	"""
-	serializer_class = PermissionSerializer
-
-	def get(self, request):
-		if not request.venue:
-			raise Venue.DoesNotExist('Venue was not passed to the request.')
-
-		user_permissions = users_venue_permissions(request.venue, request.user)
-
-		return Response(user_permissions)
-
-
-@with_default_permission_classes()
-class DashboardSectionsView(ListAPIView):
-	permission_classes = [ManagementPermissions]
-	serializer_class = serializers.DashboardSectionSerializer
-	queryset = DashboardSection.objects.all()
-
-
-@with_default_permission_classes()
-class VenueViewerTypesViewSet(ModelViewSet):
-	permission_classes = [ManagementPermissions]
-	serializer_class = serializers.VenueViewerTypeSerializer
-
-	def get_queryset(self):
-		return VenueViewerType.objects.filter(venue=self.request.venue) \
-			.prefetch_related('permissions', 'sections')

@@ -8,7 +8,7 @@ class Customer(BaseModelMixin):
 	email = models.EmailField(null=True)
 	contact = models.CharField(max_length=20, null=True)
 	address = models.CharField(max_length=200, null=True)
-	venue = models.ForeignKey('venue.Venue', on_delete=models.CASCADE, null=True)
+	venue = models.ForeignKey('venue.Venue', on_delete=models.SET_NULL, null=True, blank=True)
 
 	def __str__(self):
 		return self.name
