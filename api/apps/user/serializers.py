@@ -67,9 +67,9 @@ class UserSerializer(serializers.ModelSerializer):
 		)
 
 	def get_role(self, instance: User):
-		venue = self.context.get('request').get('venue')
+		venue = self.context.get('request').venue
 		try:
-			return instance.roles.filter(venue=venue).first().name
+			return instance.roles.filter(venue=venue).first().role.name
 		except AttributeError:
 			return None
 

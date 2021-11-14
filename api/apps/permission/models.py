@@ -32,12 +32,12 @@ class Role(BaseModelMixin):
 
 
 class UserRole(BaseModelMixin):
-	name = models.ForeignKey(Role, on_delete=models.CASCADE)
+	role = models.ForeignKey(Role, on_delete=models.CASCADE)
 	user = models.ForeignKey('venue.User', on_delete=models.CASCADE, related_name='roles')
 	venue = models.ForeignKey('venue.Venue', on_delete=models.CASCADE, related_name='roles')
 
 	def __str__(self):
-		return "{}-{}-{}".format(self.venue.name, self.user.email, self.name)
+		return "{}-{}-{}".format(self.venue.name, self.user.email, self.role.name)
 
 	class Meta:
 		unique_together = (('user', 'venue'),)
