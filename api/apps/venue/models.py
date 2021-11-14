@@ -203,7 +203,7 @@ class UserData(BaseModelMixin):
 	mobile_confirmed = models.BooleanField(default=False)
 
 	def __str__(self):
-		return self.user
+		return str(self.user)
 
 
 class UsersVenues(BaseModelMixin):
@@ -211,7 +211,7 @@ class UsersVenues(BaseModelMixin):
 	venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
 
 	def __str__(self):
-		return f'{self.venue} - {self.user}'
+		return f'{str(self.venue)} - {str(self.user)}'
 
 	class Meta:
 		verbose_name_plural = 'Users Venues'
@@ -258,4 +258,4 @@ class VenueSettingValue(BaseModelMixin):
 		unique_together = (('venue', 'setting',),)
 
 	def __str__(self):
-		return '%s %s: %s' % (self.venue, self.setting, self.value)
+		return '%s %s: %s' % (str(self.venue), str(self.setting), self.value)
