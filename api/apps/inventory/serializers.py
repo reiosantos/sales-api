@@ -54,6 +54,10 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 	latest_qty = serializers.IntegerField(required=True)
 	image_url = serializers.CharField(required=False)
 
+	vendor_detail = ItemVendorSerializer(source="vendor", read_only=True)
+	category_detail = ItemSubCategorySerializer(source="subcategory.category", read_only=True)
+	subcategory_detail = ItemSubCategorySerializer(source="subcategory", read_only=True)
+
 	def validate(self, attrs):
 		attrs = super(ItemTypeSerializer, self).validate(attrs)
 		venue: Venue = self.context['request'].venue
