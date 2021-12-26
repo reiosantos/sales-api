@@ -55,7 +55,7 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 	image_url = serializers.CharField(required=False)
 
 	vendor_detail = ItemVendorSerializer(source="vendor", read_only=True)
-	category_detail = ItemSubCategorySerializer(source="subcategory.category", read_only=True)
+	category_detail = ItemCategorySerializer(source="subcategory.category", read_only=True)
 	subcategory_detail = ItemSubCategorySerializer(source="subcategory", read_only=True)
 
 	def validate(self, attrs):
