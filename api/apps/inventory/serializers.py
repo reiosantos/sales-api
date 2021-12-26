@@ -15,10 +15,11 @@ class ItemSubCategorySerializer(serializers.ModelSerializer):
 	name = serializers.CharField(required=True)
 	category = serializers.PrimaryKeyRelatedField(
 		queryset=ItemCategory.objects.all(), default=None, required=False)
+	category_name = serializers.CharField(source="category.name", required=False, read_only=True)
 
 	class Meta:
 		model = ItemSubCategory
-		fields = ['id', 'name', 'created_at', 'modified_at', 'category']
+		fields = ['id', 'name', 'created_at', 'modified_at', 'category', 'category_name']
 
 
 class ItemCategorySerializer(serializers.ModelSerializer):
