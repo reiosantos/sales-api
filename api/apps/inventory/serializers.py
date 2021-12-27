@@ -1,6 +1,8 @@
+from django.db import IntegrityError
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from api.apps.common import logger
 from api.apps.inventory.models import ItemVendor, ItemCategory, ItemSubCategory, ItemType
 from api.apps.venue.models import Venue
 
@@ -45,25 +47,26 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 	)
 	venue = serializers.PrimaryKeyRelatedField(read_only=True)
 	name = serializers.CharField(required=True)
-	description = serializers.CharField(required=False)
+	description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
 	unit_buying_price = serializers.DecimalField(required=True, decimal_places=3, max_digits=13)
 	unit_selling_price = serializers.DecimalField(required=True, decimal_places=3, max_digits=13)
-	barcode = serializers.CharField(required=False)
+	barcode = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 	total_qty = serializers.IntegerField(required=False, read_only=True)
 	available_qty = serializers.IntegerField(required=False, read_only=True)
 	latest_qty = serializers.IntegerField(required=True)
-	image_url = serializers.CharField(required=False)
+	image_url = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
 	is_wire_type = serializers.BooleanField(allow_null=True, required=False, default=False)
 	is_available = serializers.BooleanField(allow_null=True, required=False, default=True)
-	color = serializers.CharField(required=False)
-	total_length = serializers.DecimalField(required=False, read_only=True, decimal_places=3,
-											max_digits=13)
-	available_length = serializers.DecimalField(required=False, read_only=True, decimal_places=3,
-												max_digits=13)
-	latest_length = serializers.DecimalField(required=False, decimal_places=3, max_digits=13)
-	unit_selling_price_per_meter = serializers.DecimalField(required=False, allow_null=True,
-															decimal_places=3, max_digits=13)
+	color = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+	total_length = serializers.DecimalField(
+		required=False, read_only=True, decimal_places=3, max_digits=13)
+	available_length = serializers.DecimalField(
+		required=False, read_only=True, decimal_places=3, max_digits=13)
+	latest_length = serializers.DecimalField(
+		required=False, allow_null=True, decimal_places=3, max_digits=13)
+	unit_selling_price_per_meter = serializers.DecimalField(
+		required=False, allow_null=True, decimal_places=3, max_digits=13)
 
 	vendor_detail = ItemVendorSerializer(source="vendor", read_only=True)
 	category_detail = ItemCategorySerializer(source="subcategory.category", read_only=True)
@@ -94,7 +97,18 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 		if not validated_data.get('available_qty'):
 			validated_data['available_qty'] = validated_data['latest_qty']
 
-		return super(ItemTypeSerializer, self).create(validated_data)
+		if not validated_data.get('total_length'):
+			validated_data['total_length'] = validated_data['latest_length']
+
+		if not validated_data.get('available_length'):
+			validated_data['available_length'] = validated_data['latest_length']
+
+		try:
+			return super(ItemTypeSerializer, self).create(validated_data)
+		except IntegrityError as e:
+			logger.exception(e)
+			raise IntegrityError(
+				"This item already exists, you might want to update the existing record instead")
 
 	def update(self, instance: ItemType, validated_data):
 		if validated_data.get('latest_qty'):
@@ -102,6 +116,12 @@ class ItemTypeSerializer(serializers.ModelSerializer):
 			instance.latest_qty = latest_qty
 			instance.total_qty += latest_qty
 			instance.available_qty += latest_qty
+
+		if validated_data.get('latest_length'):
+			latest_len = float(validated_data.get('latest_length'))
+			instance.latest_length = latest_len
+			instance.total_length += latest_len
+			instance.available_length += latest_len
 
 		return super(ItemTypeSerializer, self).update(instance, validated_data)
 
