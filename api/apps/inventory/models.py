@@ -59,6 +59,27 @@ class ItemType(BaseModelMixin):
 	latest_qty = models.IntegerField(null=False, blank=False, default=0)
 	image_url = models.CharField(max_length=200, null=True, blank=True)
 
+	is_wire_type = models.BooleanField(default=False, null=True)
+	is_available = models.BooleanField(default=True, null=True)
+	color = models.CharField(max_length=200, null=True, blank=True)
+	total_length = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3, help_text="Length of wire in metres"
+	)
+	latest_length = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3,
+		help_text="New Length of wire in metres"
+	)
+	available_length = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3,
+		help_text="New Length of wire in metres"
+	)
+	unit_buying_price_per_meter = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3, default=0
+	)
+	unit_selling_price_per_meter = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3, default=0
+	)
+
 	def __str__(self):
 		return '%s - %s' % (self.subcategory, self.name)
 

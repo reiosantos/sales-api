@@ -17,6 +17,10 @@ class ItemSaleSerializer(serializers.ModelSerializer):
 	customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all(), required=False)
 	unit_price = serializers.DecimalField(required=True, decimal_places=3, max_digits=13)
 	quantity = serializers.IntegerField(required=True)
+	sold_length = serializers.DecimalField(required=False, decimal_places=3, max_digits=13,
+										   help_text="Length of wire sold")
+	price_per_meter = serializers.DecimalField(required=False, allow_null=True, decimal_places=3,
+											   max_digits=13)
 
 	item_detail = ItemTypeSerializer(source='item', read_only=True)
 	customer_detail = CustomerSerializer(source='customer', read_only=True)

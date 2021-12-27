@@ -12,3 +12,11 @@ class ItemSale(BaseModelMixin):
 	customer = models.ForeignKey('customers.Customer', null=True, on_delete=models.SET_NULL)
 	deleted = models.BooleanField(null=True)
 	deletion_reason = models.TextField(null=True)
+	sold_length = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3,
+		help_text="Length of wire sold in metres"
+	)
+	price_per_meter = models.DecimalField(
+		max_digits=13, null=True, blank=True, decimal_places=3,
+		help_text="Price per meter of wire sold"
+	)
