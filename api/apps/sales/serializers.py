@@ -7,11 +7,12 @@ from api.apps.customers.serializers import CustomerSerializer
 from api.apps.inventory.models import ItemType
 from api.apps.inventory.serializers import ItemTypeSerializer
 from api.apps.sales.models import ItemSale
-from api.apps.user.serializers import UserProfileSerializer
+from api.apps.user.serializers import UserSerializer
 from api.apps.venue.models import User
 
 
 class ItemSaleSerializer(serializers.ModelSerializer):
+	ref = serializers.CharField(read_only=True)
 	item = serializers.PrimaryKeyRelatedField(queryset=ItemType.objects.all(), required=True)
 	sold_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
 	customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all(), required=False)
@@ -25,7 +26,7 @@ class ItemSaleSerializer(serializers.ModelSerializer):
 
 	item_detail = ItemTypeSerializer(source='item', read_only=True)
 	customer_detail = CustomerSerializer(source='customer', read_only=True)
-	sold_by_detail = UserProfileSerializer(source='sold_by.profile', read_only=True)
+	sold_by_detail = UserSerializer(source='sold_by', read_only=True)
 
 	def create(self, validated_data):
 		sp = validated_data['item'].unit_selling_price

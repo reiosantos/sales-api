@@ -39,6 +39,7 @@ class ItemCategorySerializer(serializers.ModelSerializer):
 
 
 class ItemTypeSerializer(serializers.ModelSerializer):
+	ref = serializers.CharField(read_only=True)
 	vendor = serializers.PrimaryKeyRelatedField(
 		queryset=ItemVendor.objects.all(), required=True
 	)

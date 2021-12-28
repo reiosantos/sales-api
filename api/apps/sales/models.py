@@ -4,6 +4,7 @@ from api.apps.common.model_mixins import BaseModelMixin
 
 
 class ItemSale(BaseModelMixin):
+	ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
 	item = models.ForeignKey('inventory.ItemType', on_delete=models.CASCADE)
 	sold_by = models.ForeignKey(
 		'venue.User', on_delete=models.SET_NULL, null=True, blank=True, related_name="items_sold")
@@ -20,3 +21,6 @@ class ItemSale(BaseModelMixin):
 		max_digits=13, null=True, blank=True, decimal_places=3,
 		help_text="Price per meter of wire sold"
 	)
+
+	def generate_ref(self, prefix=None):
+		super(ItemSale, self).generate_ref('SAL')

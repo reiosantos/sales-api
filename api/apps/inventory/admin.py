@@ -1,12 +1,14 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
+from api.apps.common.model_mixins import BaseModelAdminMixin
 from api.apps.inventory.models import ItemVendor, ItemCategory, ItemSubCategory, ItemType
 
 
-class ItemTypeAdmin(admin.ModelAdmin):
-	list_display = list_display_links = ('name',)
-	list_filter = ('subcategory', 'vendor', 'name', 'barcode')
+class ItemTypeAdmin(BaseModelAdminMixin):
+	list_display = list_display_links = ('ref', 'name',)
+	list_filter = ('ref', 'subcategory', 'vendor', 'name', 'barcode')
+	readonly_fields = ["ref"]
 
 
 class ItemSubcategoryInline(admin.TabularInline):

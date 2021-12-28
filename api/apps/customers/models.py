@@ -4,6 +4,7 @@ from api.apps.common.model_mixins import BaseModelMixin
 
 
 class Customer(BaseModelMixin):
+	ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
 	name = models.CharField(max_length=120, null=False)
 	email = models.EmailField(null=True)
 	contact = models.CharField(max_length=20, null=True)
@@ -12,3 +13,6 @@ class Customer(BaseModelMixin):
 
 	def __str__(self):
 		return self.name
+
+	def generate_ref(self, prefix=None):
+		super(Customer, self).generate_ref('CUS')
