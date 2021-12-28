@@ -118,8 +118,10 @@ class AuditlogMiddleware(MiddlewareMixin):
 		info['table_pk'] = instance.pk
 		info['action'] = kwargs.get('action')
 		info['prev_entity'] = json.loads(json.dumps(obj, cls=CCJSONEncoder))
-		info['user_id'] = kwargs.get('user')
 		info['venue'] = kwargs.get('venue')
+
+		if isinstance(kwargs.get('user'), int):
+			info['user_id'] = kwargs.get('user')
 
 		query_kwargs = dict()
 		query_kwargs[instance._meta.pk.name] = info['table_pk']
@@ -136,4 +138,8 @@ class AuditlogMiddleware(MiddlewareMixin):
 		except ValueError as e:
 			# SimpleLazyObject: <django.contrib.auth.models.AnonymousUser>
 			# Cannot be assigned to User instance
+			log.error(e)
+		except TypeError as e:
+			# int() argument must be a string, a bytes-like object or a number,
+			# not 'SimpleLazyObject'
 			log.error(e)

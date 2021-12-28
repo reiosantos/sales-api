@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 import six
@@ -16,5 +15,5 @@ class CCJSONEncoder(DjangoJSONEncoder):
 		try:
 			return super(CCJSONEncoder, self).default(o)
 		except Exception as e:
-			log.exception(e)
+			log.error(str(e))
 			return six.text_type(o)
