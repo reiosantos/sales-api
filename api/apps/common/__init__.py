@@ -10,6 +10,8 @@ from rest_framework.views import exception_handler as default_exception_handler
 
 logger = logging.getLogger('api')
 
+default_app_config = 'api.apps.common.apps.CommonConfig'
+
 
 def exception_handler(exc, context):
 	exc_type, exc_value, exc_traceback = sys.exc_info()

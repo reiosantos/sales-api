@@ -6,9 +6,9 @@ from api.apps.common.model_mixins import BaseModelMixin
 class Customer(BaseModelMixin):
 	ref = models.CharField(max_length=20, db_index=True, null=True, blank=True)
 	name = models.CharField(max_length=120, null=False)
-	email = models.EmailField(null=True)
-	contact = models.CharField(max_length=20, null=True)
-	address = models.CharField(max_length=200, null=True)
+	email = models.EmailField(null=True, blank=True)
+	contact = models.CharField(max_length=20, null=True, blank=True)
+	address = models.CharField(max_length=200, null=True, blank=True)
 	venue = models.ForeignKey('venue.Venue', on_delete=models.SET_NULL, null=True, blank=True)
 
 	def __str__(self):
