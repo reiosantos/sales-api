@@ -5,8 +5,6 @@ services:
     build: .
     image: sales-api
     container_name: sales-api
-    ports:
-      - "8000:8000"
     volumes:
       - ./:/usr/src/app/
     network_mode: host
