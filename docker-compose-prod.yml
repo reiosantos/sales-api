@@ -10,7 +10,7 @@ services:
     network_mode: host
     environment:
       - ENV=prod
-      - DATABASE_URL=postgres://postgres@localhost:5432/sales_db_prod
+      - DATABASE_URL=postgres://postgres:prod_pass123x@localhost:5432/sales_db_prod
       - BASE_URL=http://localhost:8000/
       - EMAIL_HOST_USER=ronireiosantos@gmail.com
       - EMAIL_HOST_PASSWORD=kiyvuylobsrbyknp
