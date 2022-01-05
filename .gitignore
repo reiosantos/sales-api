@@ -111,3 +111,6 @@ pipeline.gdsl
 /supervisord.pid
 *.pid
 datadir/
+datadir-prod/
+# Only used locally for data to be exported
+docker-compose-prod.yml
